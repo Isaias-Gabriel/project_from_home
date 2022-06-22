@@ -56,5 +56,5 @@ def create_words(
 create_words(word_index, [""], 1, 5)
 
 #save the data from the dictionary in a JSON file
-with open('JSON files/indexes_and_new_words.js', 'w') as fp:
-    json.dump(new_words_dictionary, fp, indent=4)
+with open('JSON files/indexes_and_new_words.js', 'w') as json_file:
+    json.dump(new_words_dictionary, json_file, indent=4)
