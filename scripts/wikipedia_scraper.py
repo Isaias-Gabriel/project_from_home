@@ -25,6 +25,9 @@ from selenium.webdriver.common.keys import Keys
 
 # driver.close()
 
+
+driver = webdriver.Chrome()
+
 acceptable_alphabetical_characters = [
         'a', 'á', 'à', 'ã', 'â', 'b', 'c', 'd', 'e', 'ê', 'é', 'f', 'g',
         'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'ô', 'õ', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'v',
@@ -133,9 +136,6 @@ def process_page_content(content_to_process):
     no_textual_duplicates = list(dict.fromkeys(textual_content))
     no_numerical_duplicates = list(dict.fromkeys(numerical_content))
 
-    print(textual_content, numerical_content)
-    print(no_textual_duplicates, no_numerical_duplicates)
-
     # count the words and the numbers
     # and save the information on a dictionary
     old_words_and_weights = {}
@@ -148,11 +148,24 @@ def process_page_content(content_to_process):
 
     return old_words_and_weights
 
-# main function to get the content from the wikipedia pages
-def get_content(is_from_visited_page):
-    driver = webdriver.Chrome()
+# check if the link is acceptable to be accessed later
+def check_link(link):
+    if(page_is_visited(link)):
+        return False
 
-    if(not is_from_visited_page):
+    # "https://pt.wikipedia.org/wiki/Sistema_fechado"
+    # every valid link has only 4 '/' and no '#'
+    elif(link.count('/') > 4 or link.count('#') > 0):
+        return False
+
+    else:
+        return True
+
+
+# main function to get the content from the wikipedia pages
+def get_content(page_url, level):
+
+    if(page_url == "" and level == 0):
         driver.get("https://pt.wikipedia.org/")
 
     driver.find_element(by=By.XPATH, value='//*[@id="n-randompage"]/a').click()
@@ -160,9 +173,13 @@ def get_content(is_from_visited_page):
     # get the url of the first page visited
     visited_page_url = driver.current_url
 
+    print("level: " + str(level))
+    print(visited_page_url)
+
     # check if the page was visited
+    # if it is, begin the process again
     if(page_is_visited(visited_page_url)):
-        get_content(is_from_visited_page=True)
+        get_content(page_url="", level=0)
 
     # and if not save the url
     # to avoid future visits to it
@@ -187,25 +204,34 @@ def get_content(is_from_visited_page):
         content_to_process=content_to_process
     )
 
-    print(old_words_and_weights)
+    # print(old_words_and_weights)
 
     save_file_old_words_and_weights(new_data=old_words_and_weights)
 
-    # get the links from the page 
-    # raw_links = driver.find_elements(by=By.XPATH, value='//*[@id="bodyContent"]//p//a')
-    # links = []
+    # if level != 3
+    # get the links from the page to start another scraping
+    if(level != 2):
+        raw_links = driver.find_elements(by=By.XPATH, value='//*[@id="bodyContent"]//p//a')
+        links = []
 
-    # for link in raw_links:
-    #     links.append(link.get_attribute('href'))
+        for link in raw_links:
+            if(link):
+                if(check_link(link.get_attribute('href'))):
+                    links.append(link.get_attribute('href'))
 
-    # print(content)
-    # print(links)
+        # print(links)
+        
+        for link in links:
+            get_content(page_url=link, level=(level + 1))
+
+    else:
+        return 1
 
 
 
-# number_of_executions = int(input("Number of times the main loop should be run: "))
+number_of_executions = int(input("Number of times the main loop should be run: "))
 
-# for currente_execution_number in range(number_of_executions):
-#     get_content()
+for currente_execution_number in range(number_of_executions):
+    get_content(page_url="", level=0)
 
-get_content(is_from_visited_page=False)
+# get_content(page_url="", level=0)
