@@ -208,16 +208,18 @@ def get_content(page_url, level):
 
     save_file_old_words_and_weights(new_data=old_words_and_weights)
 
-    # if level != 3
+    # if level != x
     # get the links from the page to start another scraping
-    if(level != 2):
+    if(level != 3):
         raw_links = driver.find_elements(by=By.XPATH, value='//*[@id="bodyContent"]//p//a')
         links = []
 
         for link in raw_links:
-            if(link):
-                if(check_link(link.get_attribute('href'))):
-                    links.append(link.get_attribute('href'))
+            link_as_string = link.get_attribute('href')
+
+            if(link_as_string):
+                if(check_link(link_as_string)):
+                    links.append(link_as_string)
 
         # print(links)
         
