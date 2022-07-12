@@ -231,9 +231,9 @@ def get_content(page_url, level):
 
 
 
-number_of_executions = int(input("Number of times the main loop should be run: "))
+# number_of_executions = int(input("Number of times the main loop should be run: "))
 
-for currente_execution_number in range(number_of_executions):
+for currente_execution_number in range(1):
     get_content(page_url="", level=0)
 
 # get_content(page_url="", level=0)
