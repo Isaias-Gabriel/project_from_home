@@ -229,8 +229,6 @@ def get_content(page_url, level):
     else:
         return 1
 
-
-
 # number_of_executions = int(input("Number of times the main loop should be run: "))
 
 for currente_execution_number in range(1):
